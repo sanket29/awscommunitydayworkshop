@@ -1,5 +1,687 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AWS Student Community Day | Serverless Workshop Lab</title><style>*{box-sizing:border-box}body{margin:0;background:#f6f8fc;color:#17213c;font:15px/1.65 system-ui,-apple-system,Segoe UI,Arial}.shell{display:grid;grid-template-columns:285px 1fr;min-height:100vh}aside{background:#101b36;color:#e9edff;padding:28px 18px;position:sticky;top:0;height:100vh;overflow:auto}aside h2{font-size:18px;line-height:1.35;margin:0 0 20px}aside .kicker{font-size:11px;letter-spacing:.12em;color:#7fb1ff;font-weight:800}nav button{display:block;width:100%;text-align:left;background:none;border:0;color:#b8c6ea;padding:10px;border-radius:9px;cursor:pointer;font:inherit;font-size:13px}nav button.active{background:#30456d;color:white}main{width:min(900px,100%);padding:38px 36px 80px;margin:auto}h1{font-size:35px;letter-spacing:-.04em;line-height:1.12;margin:12px 0}h2{font-size:24px;letter-spacing:-.02em}h3{font-size:16px;margin:0 0 8px}.sub{font-size:17px;color:#566583}.card{background:white;border:1px solid #e3e8f2;border-radius:18px;padding:25px;margin:20px 0;box-shadow:0 7px 22px #1223460a}.pill{display:inline-block;padding:5px 11px;border-radius:100px;background:#ebf1ff;color:#3158a0;font-size:12px;font-weight:700}.stepnum{color:#3e66b6;font-weight:750;font-size:13px}.desc{white-space:pre-line}.btn,.copy{background:#294da5;border:none;color:#fff;border-radius:9px;padding:10px 15px;font-weight:650;cursor:pointer;text-decoration:none;display:inline-block;font-size:13px}.copy{background:#eff3fa;color:#263b65;margin-left:8px}.btn:hover{background:#1c3a80}.code{background:#141f34;color:#e9f3ff;border-radius:13px;padding:18px;overflow:auto;white-space:pre;font:12px/1.6 ui-monospace,Consolas,monospace;max-height:400px}code{background:#edf2fa;padding:2px 4px;border-radius:3px}.check{display:flex;align-items:center;gap:10px;background:#eef9f2;padding:12px 14px;border-radius:10px;color:#235c3c;margin-top:15px}.check input{width:18px;height:18px}.links{display:flex;flex-wrap:wrap;gap:10px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.stat{padding:17px;border:1px solid #e6eaf4;border-radius:13px}.stat b{font-size:25px;display:block}.progress{height:7px;background:#263654;border-radius:10px;overflow:hidden;margin:14px 0}.progress span{display:block;height:100%;background:#72c8b3;width:0%}.muted{color:#718099;font-size:13px}.warning{background:#fff5db;border:1px solid #eed7a0;border-radius:10px;padding:14px}.footer{margin-top:50px;color:#7985a1;font-size:12px}@media(max-width:900px){.shell{display:block}aside{position:relative;height:auto}main{padding:24px 18px}nav{display:grid;grid-template-columns:1fr 1fr}.grid{grid-template-columns:1fr}}</style></head><body><div class="shell"><aside><div class="kicker">AWS STUDENT COMMUNITY DAY</div><h2>☁️ Build & Deploy a Full Serverless Website</h2><div class="muted">90-minute follow-along lab</div><div class="progress"><span id="bar"></span></div><div id="count" class="muted">0 / 10 completed</div><nav><button onclick="document.getElementById('s1').scrollIntoView({behavior:'smooth'})" id="n1">01 · Before you start</button><button onclick="document.getElementById('s2').scrollIntoView({behavior:'smooth'})" id="n2">02 · Create the DynamoDB table</button><button onclick="document.getElementById('s3').scrollIntoView({behavior:'smooth'})" id="n3">03 · Create a Python Lambda function</button><button onclick="document.getElementById('s4').scrollIntoView({behavior:'smooth'})" id="n4">04 · Give Lambda database permission</button><button onclick="document.getElementById('s5').scrollIntoView({behavior:'smooth'})" id="n5">05 · Test Lambda without a website</button><button onclick="document.getElementById('s6').scrollIntoView({behavior:'smooth'})" id="n6">06 · Make an HTTPS Function URL</button><button onclick="document.getElementById('s7').scrollIntoView({behavior:'smooth'})" id="n7">07 · Connect the website to Lambda</button><button onclick="document.getElementById('s8').scrollIntoView({behavior:'smooth'})" id="n8">08 · Publish the frontend with Amplify</button><button onclick="document.getElementById('s9').scrollIntoView({behavior:'smooth'})" id="n9">09 · Show the full-stack magic</button><button onclick="document.getElementById('s10').scrollIntoView({behavior:'smooth'})" id="n10">10 · Clean up after the workshop</button></nav></aside><main><span class="pill">Beginner-friendly · AWS Console only</span><h1>Build a website that remembers messages — without running a server.</h1><p class="sub">Follow the instructor, copy the provided code, create AWS resources, and publish your own cloud guestbook.</p><div class="grid"><div class="stat"><b>90 min</b>Hands-on workshop</div><div class="stat"><b>4</b>Main AWS services</div><div class="stat"><b>0</b>Local installs required</div></div><section class="card"><h2>Download the code</h2><div class="links"><a class="btn" href="frontend-deploy.zip" download>Download frontend ZIP</a><a class="btn" href="serverless-guestbook-starter.zip" download>Download all source files</a></div><p class="muted">To share this guide online, upload this HTML page and both ZIP files together to a static web host. The ZIP links also work when these three files are in the same folder on your computer.</p></section><div class="warning"><b>Workshop safety:</b> The Function URL in this lab is public and unauthenticated for learning. Use test nicknames only, don't share sensitive information, and delete resources after the session. AWS charges can continue if resources are left running. The $20 vouchers may require an eligible paid-plan account; verify credit redemption before the workshop.</div><section class="card"><h2>What are we creating?</h2><p>👩‍🎓 Browser → 🌐 AWS Amplify Hosting → ⚡ Lambda Function URL → 🐍 AWS Lambda → 🗃️ DynamoDB</p><p class="muted">IAM controls what Lambda can do inside the AWS account. CloudWatch records logs for troubleshooting.</p></section><section class="card" id="s1"><div class="stepnum">STEP 01 / 10 </div><h2>Before you start</h2><p class="desc">Open an AWS account, select one AWS Region for all resources, and redeem a voucher if your account supports promotional credits. Never share voucher codes or account passwords. Use a sandbox or personal learning account only.</p><p><a class="btn" href="https://console.aws.amazon.com/billing/home#/credits" target="_blank" rel="noopener">Open AWS Console ↗</a></p><label class="check"><input class="done" type="checkbox" data-step="1"><span>Checkpoint: Confirm the AWS Console opens and note your selected Region.</span></label></section><section class="card" id="s2"><div class="stepnum">STEP 02 / 10 </div><h2>Create the DynamoDB table</h2><p class="desc">Open DynamoDB → Tables → Create table. Table name: StudentGuestbook. Partition key: messageId (String). Leave sort key empty. Choose On-demand capacity if available, retain defaults, then Create table. Copy the Table ARN from Additional info.</p><p><a class="btn" href="https://console.aws.amazon.com/dynamodbv2/home#tables" target="_blank" rel="noopener">Open AWS Console ↗</a></p><label class="check"><input class="done" type="checkbox" data-step="2"><span>Checkpoint: Table StudentGuestbook shows Active.</span></label></section><section class="card" id="s3"><div class="stepnum">STEP 03 / 10 </div><h2>Create a Python Lambda function</h2><p class="desc">Open Lambda → Create function → Author from scratch. Name: student-guestbook-api. Choose Python 3.13 runtime (or supported Python runtime), create a new execution role with basic Lambda permissions. Create. In Code tab replace lambda_function.py with the backend file contents, then click Deploy.</p><p><a class="btn" href="https://console.aws.amazon.com/lambda/home#/create/function" target="_blank" rel="noopener">Open AWS Console ↗</a></p><details><summary>Show Python Lambda code</summary><div class="code" id="lambdaCode"></div><button class="copy" onclick="copyText('lambdaCode')">Copy Lambda code</button></details><label class="check"><input class="done" type="checkbox" data-step="3"><span>Checkpoint: Lambda deployment successful.</span></label></section><section class="card" id="s4"><div class="stepnum">STEP 04 / 10 </div><h2>Give Lambda database permission</h2><p class="desc">Lambda → Configuration → Permissions → click the role name to open IAM. Permissions → Add permissions → Create inline policy → JSON. Paste the included IAM policy, replacing the ARN placeholder with your DynamoDB table ARN. Name it GuestbookDynamoDBAccess and save.</p><p><a class="btn" href="https://console.aws.amazon.com/iam/home#/roles" target="_blank" rel="noopener">Open AWS Console ↗</a></p><details><summary>Show IAM policy template</summary><div class="code" id="policyCode"></div><button class="copy" onclick="copyText('policyCode')">Copy IAM policy</button></details><label class="check"><input class="done" type="checkbox" data-step="4"><span>Checkpoint: Role has DynamoDB Scan and PutItem for only your table.</span></label></section><section class="card" id="s5"><div class="stepnum">STEP 05 / 10 </div><h2>Test Lambda without a website</h2><p class="desc">Lambda → Test → Create new event. Paste test-post-event.json and run. Expect statusCode 201. Repeat with test-get-event.json and expect statusCode 200 and a messages array. If not, check table name, Region, role policy and CloudWatch logs.</p><p><a class="btn" href="https://console.aws.amazon.com/lambda/home#/functions" target="_blank" rel="noopener">Open AWS Console ↗</a></p><details><summary>Show POST test event</summary><div class="code" id="postCode"></div><button class="copy" onclick="copyText('postCode')">Copy POST event</button></details><details><summary>Show GET test event</summary><div class="code" id="getCode"></div><button class="copy" onclick="copyText('getCode')">Copy GET event</button></details><label class="check"><input class="done" type="checkbox" data-step="5"><span>Checkpoint: POST gives 201 and GET includes your first message.</span></label></section><section class="card" id="s6"><div class="stepnum">STEP 06 / 10 </div><h2>Make an HTTPS Function URL</h2><p class="desc">Lambda → Configuration → Function URL → Create. Auth type NONE for this short public workshop demo ONLY. Configure CORS: Allowed origins *; allowed methods GET and POST; allowed headers Content-Type. Save. Copy the HTTPS Function URL. Confirm the generated resource policy allows public invoke in your account. If your organization blocks public URLs, use an authorized workshop account.</p><p><a class="btn" href="https://console.aws.amazon.com/lambda/home#/functions" target="_blank" rel="noopener">Open AWS Console ↗</a></p><label class="check"><input class="done" type="checkbox" data-step="6"><span>Checkpoint: Opening Function URL in browser returns JSON messages.</span></label></section><section class="card" id="s7"><div class="stepnum">STEP 07 / 10 </div><h2>Connect the website to Lambda</h2><p class="desc">Download the Frontend ZIP from this guide and unzip it. Open config.js in Notepad or VS Code. Replace PASTE_YOUR_LAMBDA_FUNCTION_URL_HERE with the actual full HTTPS URL in quotes. Save. Select index.html, style.css, app.js and config.js and ZIP those four files at the ZIP root (not the parent folder).</p><label class="check"><input class="done" type="checkbox" data-step="7"><span>Checkpoint: The ZIP contains index.html at its top level.</span></label></section><section class="card" id="s8"><div class="stepnum">STEP 08 / 10 </div><h2>Publish the frontend with Amplify</h2><p class="desc">AWS Amplify → Create new app → Deploy without Git → Next. App name: student-guestbook. Branch: main. Method: Drag and drop. Upload the ZIP of the four frontend files, then Save and deploy. Wait for deployment to finish.</p><p><a class="btn" href="https://console.aws.amazon.com/amplify/home#/create" target="_blank" rel="noopener">Open AWS Console ↗</a></p><label class="check"><input class="done" type="checkbox" data-step="8"><span>Checkpoint: Your HTTPS Amplify website opens and displays the guestbook.</span></label></section><section class="card" id="s9"><div class="stepnum">STEP 09 / 10 </div><h2>Show the full-stack magic</h2><p class="desc">Open the Amplify URL. Post a harmless test message (do not enter personal data). Refresh; open DynamoDB → Explore items and find your message. Exchange website URLs with a classmate to see their site.</p><label class="check"><input class="done" type="checkbox" data-step="9"><span>Checkpoint: Your message persists after a page refresh.</span></label></section><section class="card" id="s10"><div class="stepnum">STEP 10 / 10 </div><h2>Clean up after the workshop</h2><p class="desc">Delete the Amplify app (not just close the browser). Delete Lambda function student-guestbook-api. Delete DynamoDB table StudentGuestbook. Delete any custom CloudWatch log group if desired. Verify resources are gone. Check billing over the next days.</p><p><a class="btn" href="https://console.aws.amazon.com/billing/home#/bills" target="_blank" rel="noopener">Open AWS Console ↗</a></p><label class="check"><input class="done" type="checkbox" data-step="10"><span>Checkpoint: Amplify app, Lambda function and DynamoDB table are deleted.</span></label></section><div class="footer">Workshop starter | AWS Student Community Day | Designed for instructor-led teaching</div></main></div><script>
-const data={"lambdaCode": "import json\nimport os\nimport uuid\nfrom datetime import datetime, timezone\nimport boto3\n\nTABLE_NAME = os.environ.get('TABLE_NAME', 'StudentGuestbook')\ntable = boto3.resource('dynamodb').Table(TABLE_NAME)\n\ndef respond(status, payload):\n    return {'statusCode': status, 'headers': {'Content-Type': 'application/json'}, 'body': json.dumps(payload)}\n\ndef lambda_handler(event, context):\n    method = event.get('requestContext', {}).get('http', {}).get('method', 'GET')\n    try:\n        if method == 'GET':\n            result = table.scan(Limit=50)\n            messages = sorted(result.get('Items', []), key=lambda x: x.get('createdAt', ''), reverse=True)\n            return respond(200, {'messages': messages})\n        if method == 'POST':\n            data = json.loads(event.get('body') or '{}')\n            name = str(data.get('name', '')).strip()\n            message = str(data.get('message', '')).strip()\n            if not (1 <= len(name) <= 30 and 1 <= len(message) <= 240):\n                return respond(400, {'error': 'Nickname must be 1\u201330 characters and message 1\u2013240 characters.'})\n            item = {'messageId': str(uuid.uuid4()), 'name': name, 'message': message,\n                    'createdAt': datetime.now(timezone.utc).isoformat()}\n            table.put_item(Item=item)\n            return respond(201, {'ok': True, 'messageId': item['messageId']})\n        return respond(405, {'error': 'Method not allowed'})\n    except (ValueError, TypeError):\n        return respond(400, {'error': 'Invalid JSON request'})\n    except Exception as err:\n        print('Request failed:', str(err))\n        return respond(500, {'error': 'Backend error; check Lambda logs'})\n", "policyCode": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Effect\": \"Allow\",\n      \"Action\": [\n        \"dynamodb:Scan\",\n        \"dynamodb:PutItem\"\n      ],\n      \"Resource\": \"REPLACE_WITH_YOUR_DYNAMODB_TABLE_ARN\"\n    }\n  ]\n}", "postCode": "{\n  \"version\": \"2.0\",\n  \"requestContext\": {\n    \"http\": {\n      \"method\": \"POST\"\n    }\n  },\n  \"body\": \"{\\\"name\\\": \\\"Cloud Ninja\\\", \\\"message\\\": \\\"Hello AWS Student Community Day!\\\"}\"\n}", "getCode": "{\n  \"version\": \"2.0\",\n  \"requestContext\": {\n    \"http\": {\n      \"method\": \"GET\"\n    }\n  }\n}"};for(const [id,s] of Object.entries(data))document.getElementById(id).textContent=s;
-function copyText(id){navigator.clipboard.writeText(document.getElementById(id).textContent).then(()=>alert('Copied to clipboard')).catch(()=>alert('Copy manually: select the code and press Ctrl+C'));}
-const checks=[...document.querySelectorAll('.done')];function refresh(){let n=0;checks.forEach(c=>{if(c.checked)n++;localStorage.setItem('aws-lab-'+c.dataset.step,c.checked?'yes':'no');});document.getElementById('bar').style.width=(n/checks.length*100)+'%';document.getElementById('count').textContent=n+' / '+checks.length+' completed';}checks.forEach(c=>{c.checked=localStorage.getItem('aws-lab-'+c.dataset.step)==='yes';c.addEventListener('change',refresh)});refresh();
-</script></body></html>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>AWS Student Community Day | Serverless Workshop Lab</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: #f6f8fc;
+        color: #17213c;
+        font:
+          15px/1.65 system-ui,
+          -apple-system,
+          Segoe UI,
+          Arial;
+      }
+      .shell {
+        display: grid;
+        grid-template-columns: 285px 1fr;
+        min-height: 100vh;
+      }
+      aside {
+        background: #101b36;
+        color: #e9edff;
+        padding: 28px 18px;
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        overflow: auto;
+      }
+      aside h2 {
+        font-size: 18px;
+        line-height: 1.35;
+        margin: 0 0 20px;
+      }
+      aside .kicker {
+        font-size: 11px;
+        letter-spacing: 0.12em;
+        color: #7fb1ff;
+        font-weight: 800;
+      }
+      nav button {
+        display: block;
+        width: 100%;
+        text-align: left;
+        background: none;
+        border: 0;
+        color: #b8c6ea;
+        padding: 10px;
+        border-radius: 9px;
+        cursor: pointer;
+        font: inherit;
+        font-size: 13px;
+      }
+      nav button.active {
+        background: #30456d;
+        color: white;
+      }
+      main {
+        width: min(900px, 100%);
+        padding: 38px 36px 80px;
+        margin: auto;
+      }
+      h1 {
+        font-size: 35px;
+        letter-spacing: -0.04em;
+        line-height: 1.12;
+        margin: 12px 0;
+      }
+      h2 {
+        font-size: 24px;
+        letter-spacing: -0.02em;
+      }
+      h3 {
+        font-size: 16px;
+        margin: 0 0 8px;
+      }
+      .sub {
+        font-size: 17px;
+        color: #566583;
+      }
+      .card {
+        background: white;
+        border: 1px solid #e3e8f2;
+        border-radius: 18px;
+        padding: 25px;
+        margin: 20px 0;
+        box-shadow: 0 7px 22px #1223460a;
+      }
+      .pill {
+        display: inline-block;
+        padding: 5px 11px;
+        border-radius: 100px;
+        background: #ebf1ff;
+        color: #3158a0;
+        font-size: 12px;
+        font-weight: 700;
+      }
+      .stepnum {
+        color: #3e66b6;
+        font-weight: 750;
+        font-size: 13px;
+      }
+      .desc {
+        white-space: pre-line;
+      }
+      .btn,
+      .copy {
+        background: #294da5;
+        border: none;
+        color: #fff;
+        border-radius: 9px;
+        padding: 10px 15px;
+        font-weight: 650;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 13px;
+      }
+      .copy {
+        background: #eff3fa;
+        color: #263b65;
+        margin-left: 8px;
+      }
+      .btn:hover {
+        background: #1c3a80;
+      }
+      .code {
+        background: #141f34;
+        color: #e9f3ff;
+        border-radius: 13px;
+        padding: 18px;
+        overflow: auto;
+        white-space: pre;
+        font:
+          12px/1.6 ui-monospace,
+          Consolas,
+          monospace;
+        max-height: 400px;
+      }
+      code {
+        background: #edf2fa;
+        padding: 2px 4px;
+        border-radius: 3px;
+      }
+      .check {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: #eef9f2;
+        padding: 12px 14px;
+        border-radius: 10px;
+        color: #235c3c;
+        margin-top: 15px;
+      }
+      .check input {
+        width: 18px;
+        height: 18px;
+      }
+      .links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+      }
+      .stat {
+        padding: 17px;
+        border: 1px solid #e6eaf4;
+        border-radius: 13px;
+      }
+      .stat b {
+        font-size: 25px;
+        display: block;
+      }
+      .progress {
+        height: 7px;
+        background: #263654;
+        border-radius: 10px;
+        overflow: hidden;
+        margin: 14px 0;
+      }
+      .progress span {
+        display: block;
+        height: 100%;
+        background: #72c8b3;
+        width: 0%;
+      }
+      .muted {
+        color: #718099;
+        font-size: 13px;
+      }
+      .warning {
+        background: #fff5db;
+        border: 1px solid #eed7a0;
+        border-radius: 10px;
+        padding: 14px;
+      }
+      .footer {
+        margin-top: 50px;
+        color: #7985a1;
+        font-size: 12px;
+      }
+      @media (max-width: 900px) {
+        .shell {
+          display: block;
+        }
+        aside {
+          position: relative;
+          height: auto;
+        }
+        main {
+          padding: 24px 18px;
+        }
+        nav {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+        }
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <aside>
+        <div class="kicker">AWS STUDENT COMMUNITY DAY</div>
+        <h2>☁️ Build & Deploy a Full Serverless Website</h2>
+        <div class="muted">90-minute follow-along lab</div>
+        <div class="progress"><span id="bar"></span></div>
+        <div id="count" class="muted">0 / 10 completed</div>
+        <nav>
+          <button
+            onclick="
+              document
+                .getElementById('s1')
+                .scrollIntoView({ behavior: 'smooth' })
+            "
+            id="n1"
+          >
+            01 · Before you start</button
+          ><button
+            onclick="
+              document
+                .getElementById('s2')
+                .scrollIntoView({ behavior: 'smooth' })
+            "
+            id="n2"
+          >
+            02 · Create the DynamoDB table</button
+          ><button
+            onclick="
+              document
+                .getElementById('s3')
+                .scrollIntoView({ behavior: 'smooth' })
+            "
+            id="n3"
+          >
+            03 · Create a Python Lambda function</button
+          ><button
+            onclick="
+              document
+                .getElementById('s4')
+                .scrollIntoView({ behavior: 'smooth' })
+            "
+            id="n4"
+          >
+            04 · Give Lambda database permission</button
+          ><button
+            onclick="
+              document
+                .getElementById('s5')
+                .scrollIntoView({ behavior: 'smooth' })
+            "
+            id="n5"
+          >
+            05 · Test Lambda without a website</button
+          ><button
+            onclick="
+              document
+                .getElementById('s6')
+                .scrollIntoView({ behavior: 'smooth' })
+            "
+            id="n6"
+          >
+            06 · Make an HTTPS Function URL</button
+          ><button
+            onclick="
+              document
+                .getElementById('s7')
+                .scrollIntoView({ behavior: 'smooth' })
+            "
+            id="n7"
+          >
+            07 · Connect the website to Lambda</button
+          ><button
+            onclick="
+              document
+                .getElementById('s8')
+                .scrollIntoView({ behavior: 'smooth' })
+            "
+            id="n8"
+          >
+            08 · Publish the frontend with Amplify</button
+          ><button
+            onclick="
+              document
+                .getElementById('s9')
+                .scrollIntoView({ behavior: 'smooth' })
+            "
+            id="n9"
+          >
+            09 · Show the full-stack magic</button
+          ><button
+            onclick="
+              document
+                .getElementById('s10')
+                .scrollIntoView({ behavior: 'smooth' })
+            "
+            id="n10"
+          >
+            10 · Clean up after the workshop
+          </button>
+        </nav>
+      </aside>
+      <main>
+        <span class="pill">Beginner-friendly · AWS Console only</span>
+        <h1>
+          Build a website that remembers messages — without running a server.
+        </h1>
+        <p class="sub">
+          Follow the instructor, copy the provided code, create AWS resources,
+          and publish your own cloud guestbook.
+        </p>
+        <div class="grid">
+          <div class="stat"><b>90 min</b>Hands-on workshop</div>
+          <div class="stat"><b>4</b>Main AWS services</div>
+          <div class="stat"><b>0</b>Local installs required</div>
+        </div>
+        <section class="card">
+          <h2>Download the code</h2>
+          <div class="links">
+            <a class="btn" href="frontend-deploy.zip" download
+              >Download frontend ZIP</a
+            ><a class="btn" href="serverless-guestbook-starter.zip" download
+              >Download all source files</a
+            >
+          </div>
+          <p class="muted"></p>
+        </section>
+        <div class="warning">
+          <b>Workshop safety:</b> The Function URL in this lab is public and
+          unauthenticated for learning. Use test nicknames only, don't share
+          sensitive information, and delete resources after the session. AWS
+          charges can continue if resources are left running. The $20 vouchers
+          may require an eligible paid-plan account; verify credit redemption
+          before the workshop.
+        </div>
+        <section class="card">
+          <h2>What are we creating?</h2>
+          <p>
+            👩‍🎓 Browser → 🌐 AWS Amplify Hosting → ⚡ Lambda Function URL → 🐍
+            AWS Lambda → 🗃️ DynamoDB
+          </p>
+          <p class="muted">
+            IAM controls what Lambda can do inside the AWS account. CloudWatch
+            records logs for troubleshooting.
+          </p>
+        </section>
+        <section class="card" id="s1">
+          <div class="stepnum">STEP 01 / 10</div>
+          <h2>Before you start</h2>
+          <p class="desc">
+            Open an AWS account, select one AWS Region for all resources, and
+            redeem a voucher if your account supports promotional credits. Never
+            share voucher codes or account passwords. Use a sandbox or personal
+            learning account only.
+          </p>
+          <p>
+            <a
+              class="btn"
+              href="https://console.aws.amazon.com/billing/home#/credits"
+              target="_blank"
+              rel="noopener"
+              >Open AWS Console ↗</a
+            >
+          </p>
+          <label class="check"
+            ><input class="done" type="checkbox" data-step="1" /><span
+              >Checkpoint: Confirm the AWS Console opens and note your selected
+              Region.</span
+            ></label
+          >
+        </section>
+        <section class="card" id="s2">
+          <div class="stepnum">STEP 02 / 10</div>
+          <h2>Create the DynamoDB table</h2>
+          <p class="desc">
+            Open DynamoDB → Tables → Create table. Table name: StudentGuestbook.
+            Partition key: messageId (String). Leave sort key empty. Choose
+            On-demand capacity if available, retain defaults, then Create table.
+            Copy the Table ARN from Additional info.
+          </p>
+          <p>
+            <a
+              class="btn"
+              href="https://console.aws.amazon.com/dynamodbv2/home#tables"
+              target="_blank"
+              rel="noopener"
+              >Open AWS Console ↗</a
+            >
+          </p>
+          <label class="check"
+            ><input class="done" type="checkbox" data-step="2" /><span
+              >Checkpoint: Table StudentGuestbook shows Active.</span
+            ></label
+          >
+        </section>
+        <section class="card" id="s3">
+          <div class="stepnum">STEP 03 / 10</div>
+          <h2>Create a Python Lambda function</h2>
+          <p class="desc">
+            Open Lambda → Create function → Author from scratch. Name:
+            student-guestbook-api. Choose Python 3.13 runtime (or supported
+            Python runtime), create a new execution role with basic Lambda
+            permissions. Create. In Code tab replace lambda_function.py with the
+            backend file contents, then click Deploy.
+          </p>
+          <p>
+            <a
+              class="btn"
+              href="https://console.aws.amazon.com/lambda/home#/create/function"
+              target="_blank"
+              rel="noopener"
+              >Open AWS Console ↗</a
+            >
+          </p>
+          <details>
+            <summary>Show Python Lambda code</summary>
+            <div class="code" id="lambdaCode"></div>
+            <button class="copy" onclick="copyText('lambdaCode')">
+              Copy Lambda code
+            </button>
+          </details>
+          <label class="check"
+            ><input class="done" type="checkbox" data-step="3" /><span
+              >Checkpoint: Lambda deployment successful.</span
+            ></label
+          >
+        </section>
+        <section class="card" id="s4">
+          <div class="stepnum">STEP 04 / 10</div>
+          <h2>Give Lambda database permission</h2>
+          <p class="desc">
+            Lambda → Configuration → Permissions → click the role name to open
+            IAM. Permissions → Add permissions → Create inline policy → JSON.
+            Paste the included IAM policy, replacing the ARN placeholder with
+            your DynamoDB table ARN. Name it GuestbookDynamoDBAccess and save.
+          </p>
+          <p>
+            <a
+              class="btn"
+              href="https://console.aws.amazon.com/iam/home#/roles"
+              target="_blank"
+              rel="noopener"
+              >Open AWS Console ↗</a
+            >
+          </p>
+          <details>
+            <summary>Show IAM policy template</summary>
+            <div class="code" id="policyCode"></div>
+            <button class="copy" onclick="copyText('policyCode')">
+              Copy IAM policy
+            </button>
+          </details>
+          <label class="check"
+            ><input class="done" type="checkbox" data-step="4" /><span
+              >Checkpoint: Role has DynamoDB Scan and PutItem for only your
+              table.</span
+            ></label
+          >
+        </section>
+        <section class="card" id="s5">
+          <div class="stepnum">STEP 05 / 10</div>
+          <h2>Test Lambda without a website</h2>
+          <p class="desc">
+            Lambda → Test → Create new event. Paste test-post-event.json and
+            run. Expect statusCode 201. Repeat with test-get-event.json and
+            expect statusCode 200 and a messages array. If not, check table
+            name, Region, role policy and CloudWatch logs.
+          </p>
+          <p>
+            <a
+              class="btn"
+              href="https://console.aws.amazon.com/lambda/home#/functions"
+              target="_blank"
+              rel="noopener"
+              >Open AWS Console ↗</a
+            >
+          </p>
+          <details>
+            <summary>Show POST test event</summary>
+            <div class="code" id="postCode"></div>
+            <button class="copy" onclick="copyText('postCode')">
+              Copy POST event
+            </button>
+          </details>
+          <details>
+            <summary>Show GET test event</summary>
+            <div class="code" id="getCode"></div>
+            <button class="copy" onclick="copyText('getCode')">
+              Copy GET event
+            </button>
+          </details>
+          <label class="check"
+            ><input class="done" type="checkbox" data-step="5" /><span
+              >Checkpoint: POST gives 201 and GET includes your first
+              message.</span
+            ></label
+          >
+        </section>
+        <section class="card" id="s6">
+          <div class="stepnum">STEP 06 / 10</div>
+          <h2>Make an HTTPS Function URL</h2>
+          <p class="desc">
+            Lambda → Configuration → Function URL → Create. Auth type NONE for
+            this short public workshop demo ONLY. Configure CORS: Allowed
+            origins *; allowed methods GET and POST; allowed headers
+            Content-Type. Save. Copy the HTTPS Function URL. Confirm the
+            generated resource policy allows public invoke in your account. If
+            your organization blocks public URLs, use an authorized workshop
+            account.
+          </p>
+          <p>
+            <a
+              class="btn"
+              href="https://console.aws.amazon.com/lambda/home#/functions"
+              target="_blank"
+              rel="noopener"
+              >Open AWS Console ↗</a
+            >
+          </p>
+          <label class="check"
+            ><input class="done" type="checkbox" data-step="6" /><span
+              >Checkpoint: Opening Function URL in browser returns JSON
+              messages.</span
+            ></label
+          >
+        </section>
+        <section class="card" id="s7">
+          <div class="stepnum">STEP 07 / 10</div>
+          <h2>Connect the website to Lambda</h2>
+          <p class="desc">
+            Download the Frontend ZIP from this guide and unzip it. Open
+            config.js in Notepad or VS Code. Replace
+            PASTE_YOUR_LAMBDA_FUNCTION_URL_HERE with the actual full HTTPS URL
+            in quotes. Save. Select index.html, style.css, app.js and config.js
+            and ZIP those four files at the ZIP root (not the parent folder).
+          </p>
+          <label class="check"
+            ><input class="done" type="checkbox" data-step="7" /><span
+              >Checkpoint: The ZIP contains index.html at its top level.</span
+            ></label
+          >
+        </section>
+        <section class="card" id="s8">
+          <div class="stepnum">STEP 08 / 10</div>
+          <h2>Publish the frontend with Amplify</h2>
+          <p class="desc">
+            AWS Amplify → Create new app → Deploy without Git → Next. App name:
+            student-guestbook. Branch: main. Method: Drag and drop. Upload the
+            ZIP of the four frontend files, then Save and deploy. Wait for
+            deployment to finish.
+          </p>
+          <p>
+            <a
+              class="btn"
+              href="https://console.aws.amazon.com/amplify/home#/create"
+              target="_blank"
+              rel="noopener"
+              >Open AWS Console ↗</a
+            >
+          </p>
+          <label class="check"
+            ><input class="done" type="checkbox" data-step="8" /><span
+              >Checkpoint: Your HTTPS Amplify website opens and displays the
+              guestbook.</span
+            ></label
+          >
+        </section>
+        <section class="card" id="s9">
+          <div class="stepnum">STEP 09 / 10</div>
+          <h2>Show the full-stack magic</h2>
+          <p class="desc">
+            Open the Amplify URL. Post a harmless test message (do not enter
+            personal data). Refresh; open DynamoDB → Explore items and find your
+            message. Exchange website URLs with a classmate to see their site.
+          </p>
+          <label class="check"
+            ><input class="done" type="checkbox" data-step="9" /><span
+              >Checkpoint: Your message persists after a page refresh.</span
+            ></label
+          >
+        </section>
+        <section class="card" id="s10">
+          <div class="stepnum">STEP 10 / 10</div>
+          <h2>Clean up after the workshop</h2>
+          <p class="desc">
+            Delete the Amplify app (not just close the browser). Delete Lambda
+            function student-guestbook-api. Delete DynamoDB table
+            StudentGuestbook. Delete any custom CloudWatch log group if desired.
+            Verify resources are gone. Check billing over the next days.
+          </p>
+          <p>
+            <a
+              class="btn"
+              href="https://console.aws.amazon.com/billing/home#/bills"
+              target="_blank"
+              rel="noopener"
+              >Open AWS Console ↗</a
+            >
+          </p>
+          <label class="check"
+            ><input class="done" type="checkbox" data-step="10" /><span
+              >Checkpoint: Amplify app, Lambda function and DynamoDB table are
+              deleted.</span
+            ></label
+          >
+        </section>
+        <div class="footer">
+          Workshop starter | AWS Student Community Day | Designed for
+          instructor-led teaching
+        </div>
+      </main>
+    </div>
+    <script>
+      const data = {
+        lambdaCode:
+          "import json\nimport os\nimport uuid\nfrom datetime import datetime, timezone\nimport boto3\n\nTABLE_NAME = os.environ.get('TABLE_NAME', 'StudentGuestbook')\ntable = boto3.resource('dynamodb').Table(TABLE_NAME)\n\ndef respond(status, payload):\n    return {'statusCode': status, 'headers': {'Content-Type': 'application/json'}, 'body': json.dumps(payload)}\n\ndef lambda_handler(event, context):\n    method = event.get('requestContext', {}).get('http', {}).get('method', 'GET')\n    try:\n        if method == 'GET':\n            result = table.scan(Limit=50)\n            messages = sorted(result.get('Items', []), key=lambda x: x.get('createdAt', ''), reverse=True)\n            return respond(200, {'messages': messages})\n        if method == 'POST':\n            data = json.loads(event.get('body') or '{}')\n            name = str(data.get('name', '')).strip()\n            message = str(data.get('message', '')).strip()\n            if not (1 <= len(name) <= 30 and 1 <= len(message) <= 240):\n                return respond(400, {'error': 'Nickname must be 1\u201330 characters and message 1\u2013240 characters.'})\n            item = {'messageId': str(uuid.uuid4()), 'name': name, 'message': message,\n                    'createdAt': datetime.now(timezone.utc).isoformat()}\n            table.put_item(Item=item)\n            return respond(201, {'ok': True, 'messageId': item['messageId']})\n        return respond(405, {'error': 'Method not allowed'})\n    except (ValueError, TypeError):\n        return respond(400, {'error': 'Invalid JSON request'})\n    except Exception as err:\n        print('Request failed:', str(err))\n        return respond(500, {'error': 'Backend error; check Lambda logs'})\n",
+        policyCode:
+          '{\n  "Version": "2012-10-17",\n  "Statement": [\n    {\n      "Effect": "Allow",\n      "Action": [\n        "dynamodb:Scan",\n        "dynamodb:PutItem"\n      ],\n      "Resource": "REPLACE_WITH_YOUR_DYNAMODB_TABLE_ARN"\n    }\n  ]\n}',
+        postCode:
+          '{\n  "version": "2.0",\n  "requestContext": {\n    "http": {\n      "method": "POST"\n    }\n  },\n  "body": "{\\"name\\": \\"Cloud Ninja\\", \\"message\\": \\"Hello AWS Student Community Day!\\"}"\n}',
+        getCode:
+          '{\n  "version": "2.0",\n  "requestContext": {\n    "http": {\n      "method": "GET"\n    }\n  }\n}',
+      };
+      for (const [id, s] of Object.entries(data))
+        document.getElementById(id).textContent = s;
+      function copyText(id) {
+        navigator.clipboard
+          .writeText(document.getElementById(id).textContent)
+          .then(() => alert("Copied to clipboard"))
+          .catch(() =>
+            alert("Copy manually: select the code and press Ctrl+C"),
+          );
+      }
+      const checks = [...document.querySelectorAll(".done")];
+      function refresh() {
+        let n = 0;
+        checks.forEach((c) => {
+          if (c.checked) n++;
+          localStorage.setItem(
+            "aws-lab-" + c.dataset.step,
+            c.checked ? "yes" : "no",
+          );
+        });
+        document.getElementById("bar").style.width =
+          (n / checks.length) * 100 + "%";
+        document.getElementById("count").textContent =
+          n + " / " + checks.length + " completed";
+      }
+      checks.forEach((c) => {
+        c.checked = localStorage.getItem("aws-lab-" + c.dataset.step) === "yes";
+        c.addEventListener("change", refresh);
+      });
+      refresh();
+    </script>
+  </body>
+</html>
